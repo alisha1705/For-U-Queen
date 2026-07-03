@@ -13,7 +13,7 @@ try {
         age: 16,                    // Age celebrated
 
         // Media Asset URLs (Can point to local paths or CDNs)
-        musicUrl: "song.mp3",
+        musicUrl: "./song.mp3",
         introGifUrl: "1.gif",
         cakeGifUrl: "2.gif",
         loaderImageUrl: "hello_kitty.png", // Birthday loader image
