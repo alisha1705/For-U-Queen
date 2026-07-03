@@ -19,12 +19,12 @@ try {
         loaderImageUrl: "hello_kitty.png", // Birthday loader image
 
         // Photo Gallery Assets (4 Polaroids)
-        galleryPhotos: [
-            { id: 1, src: "hello_kitty.png" },
-            { id: 2, src: "1.gif" },
-            { id: 3, src: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=600&auto=format&fit=crop" },
-            { id: 4, src: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?q=80&w=600&auto=format&fit=crop" }
-        ],
+        // galleryPhotos: [
+        //     { id: 1, src: "hello_kitty.png" },
+        //     { id: 2, src: "1.gif" },
+        //     { id: 3, src: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=600&auto=format&fit=crop" },
+        //     { id: 4, src: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?q=80&w=600&auto=format&fit=crop" }
+        // ],
 
         // Secret Love Letter Message (Supports multi-line text)
         letterText: `My favorite person 🐼
