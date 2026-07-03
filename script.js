@@ -258,12 +258,12 @@ I love you forever and ever and ever ♾️😘😘❤️🧿`
         curtainContent.style.pointerEvents = "none";
         STATE.audio.currentTime = 0;
 
-        STATE.audio.play().then(() => {
-            console.log("Music Started");
-        }).catch(err => {
-            console.error(err);
-            alert(err.name + "\n" + err.message);
-        });
+        // STATE.audio.play().then(() => {
+        //     console.log("Music Started");
+        // }).catch(err => {
+        //     console.error(err);
+        //     alert(err.name + "\n" + err.message);
+        // });
         // 1. Play Background Music with fade-in volume
         STATE.audio.volume = 0;
         STATE.audio.play().then(() => {
