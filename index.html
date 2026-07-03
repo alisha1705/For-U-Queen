@@ -7,38 +7,26 @@
     <title>Happy Birthday! 🎂</title>
     <meta name="description" content="Celebrate your day with joy and happiness!">
 
-    <!-- Preload Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Outfit:wght@400;600;900&family=Share+Tech+Mono&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Outfit:wght@400;600;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
-    <!-- Swiper.js CSS -->
     <link rel="stylesheet" href="swiper.min.css" />
     <link rel="stylesheet" href="style.css" />
-
-
 </head>
 
 <body>
 
-    <!-- Background Glow & Particle Container -->
     <div class="bg-glow"></div>
     <div class="floating-hearts-container" id="hearts-container"></div>
 
-
-
-    <!-- Main Retro Windows Container -->
     <div class="window-wrapper" id="window-wrapper">
         <div class="window">
-            <!-- Window Corner Screw Pins -->
             <div class="window-screw screw-tl"></div>
             <div class="window-screw screw-tr"></div>
             <div class="window-screw screw-bl"></div>
             <div class="window-screw screw-br"></div>
 
-            <!-- Window Title Header Bar -->
             <div class="window-header">
                 <div class="window-controls">
                     <div class="window-dot"></div>
@@ -48,25 +36,18 @@
                 <span class="window-title" id="window-header-title">SEAL.EXE</span>
             </div>
 
-            <!-- Main Stage Viewport -->
             <div class="window-content">
 
-                <!-- STAGE 0: CURTAINS révélateur -->
                 <div class="curtain-overlay" id="curtain-overlay">
-                    <!-- Left Curtain Panel -->
                     <div class="curtain-half curtain-left">
                         <div class="curtain-shadow-l"></div>
                     </div>
-
-                    <!-- Right Curtain Panel -->
                     <div class="curtain-half curtain-right">
                         <div class="curtain-shadow-r"></div>
                     </div>
 
-                    <!-- Top Curtain Drape -->
                     <div class="curtain-top-drape">
-                        <svg style="display:block;width:100%;height:76px" viewBox="0 0 380 76"
-                            preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg style="display:block;width:100%;height:76px" viewBox="0 0 380 76" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
                             <defs>
                                 <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="0%">
                                     <stop offset="0%" stop-color="#4e1530"></stop>
@@ -87,34 +68,22 @@
                                     <stop offset="100%" stop-color="#7a4800"></stop>
                                 </linearGradient>
                             </defs>
-                            <path d="M0,0 L380,0 L380,22 Q320,72 260,56 Q220,44 190,60 Q160,44 120,56 Q60,72 0,22 Z"
-                                fill="url(#sg)"></path>
-                            <path d="M0,0 L380,0 L380,12 Q320,54 260,42 Q220,32 190,46 Q160,32 120,42 Q60,54 0,12 Z"
-                                fill="url(#sg2)"></path>
-                            <path d="M0,22 Q60,72 120,56 Q160,44 190,60 Q220,44 260,56 Q320,72 380,22" fill="none"
-                                stroke="url(#gl)" stroke-width="3.5" opacity="0.96"></path>
+                            <path d="M0,0 L380,0 L380,22 Q320,72 260,56 Q220,44 190,60 Q160,44 120,56 Q60,72 0,22 Z" fill="url(#sg)"></path>
+                            <path d="M0,0 L380,0 L380,12 Q320,54 260,42 Q220,32 190,46 Q160,32 120,42 Q60,54 0,12 Z" fill="url(#sg2)"></path>
+                            <path d="M0,22 Q60,72 120,56 Q160,44 190,60 Q220,44 260,56 Q320,72 380,22" fill="none" stroke="url(#gl)" stroke-width="3.5" opacity="0.96"></path>
                         </svg>
 
-                        <!-- Tassel Rope & Ball hanging from center -->
                         <div class="tassel-rope">
                             <div class="tassel-string"></div>
                             <div class="tassel-ball"></div>
                             <div class="tassel-fringe">
-                                <div></div>
-                                <div></div>
-                                <div></div>
-                                <div></div>
-                                <div></div>
-                                <div></div>
-                                <div></div>
+                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Curtain Button Container -->
                     <div class="curtain-content">
                         <div class="hold-container">
-                            <!-- Radial outer details -->
                             <svg class="button-radial-ring" viewBox="0 0 136 136">
                                 <g transform="translate(68,68)">
                                     <ellipse cx="0" cy="-46" rx="5.5" ry="9.5" transform="rotate(0)"></ellipse>
@@ -130,13 +99,11 @@
 
                             <div class="hold-border-ring"></div>
 
-                            <!-- Progress Ring Circle -->
                             <svg class="progress-svg" viewBox="0 0 100 100">
-                                <circle class="bg-circle" />
-                                <circle class="bar-circle" id="hold-progress-bar" />
+                                <circle class="bg-circle" cx="50" cy="50" r="42" />
+                                <circle class="bar-circle" id="hold-progress-bar" cx="50" cy="50" r="42" />
                             </svg>
 
-                            <!-- Hold Button -->
                             <button class="hold-btn" id="hold-active-btn">
                                 <div class="hold-btn-glare"></div>
                                 <span class="heart-icon">𓆩❤︎𓆪</span>
@@ -144,7 +111,6 @@
                             </button>
                         </div>
 
-                        <!-- Instruction Tag -->
                         <div class="instruction-tag">
                             <div class="tag-pin pin-tl"></div>
                             <div class="tag-pin pin-tr"></div>
@@ -155,17 +121,13 @@
                     </div>
                 </div>
 
-                <!-- STAGE 0: COUNTDOWN VIEW -->
                 <div class="stage-view" id="stage-countdown">
                     <div class="countdown-display" id="countdown-num">3</div>
                     <div class="countdown-dots">
-                        <div></div>
-                        <div></div>
-                        <div></div>
+                        <div></div><div></div><div></div>
                     </div>
                 </div>
 
-                <!-- STAGE 0: IMAGE LOADER VIEW -->
                 <div class="stage-view" id="stage-loader">
                     <div class="loader-card">
                         <div class="loader-image-wrapper">
@@ -173,22 +135,17 @@
                         </div>
                         <p class="loader-text">Loading your birthday surprise...</p>
                         <div class="loader-pulser-dots">
-                            <div></div>
-                            <div></div>
-                            <div></div>
+                            <div></div><div></div><div></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- STAGE 1: PARTY.EXE (INTRO VIEW) -->
                 <div class="stage-view" id="stage-party">
                     <img src="" id="intro-gif-display" alt="Cute party topper animation" class="intro-gif">
-                    <h1 class="retro-title" id="intro-title-text">My girl was born 20 years ago today!</h1>
-                    <p class="retro-subtitle">✨ Yes, it’s YOU! A little surprise awaits... ✨</p>
+                    <h1 class="retro-title" id="intro-title-text">Born 16 years ago today!</h1>
+                    <p class="retro-subtitle">✨ A beautiful little surprise awaits... ✨</p>
                     <button class="retro-btn" id="intro-next-btn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-                            style="margin-bottom: -2px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: -2px;">
                             <rect x="3" y="8" width="18" height="12" rx="2" ry="2"></rect>
                             <line x1="12" y1="22" x2="12" y2="8"></line>
                             <path d="M12 8H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
@@ -199,42 +156,30 @@
                     </button>
                 </div>
 
-                <!-- STAGE 2: CAKE.EXE (CAKE CUTTING MINI-GAME) -->
                 <div class="stage-view" id="stage-cake">
                     <div class="stage-cake-wrap">
-                        <!-- Canvas for drawing slice lines -->
                         <canvas class="cake-canvas" id="cake-slice-canvas"></canvas>
-
-                        <div class="retro-title" id="cake-title-text"
-                            style="z-index: 10; color: #e85ab5; font-size: clamp(1rem, 4vw, 1.4rem);">Swipe to Cut the
-                            Cake!
-                        </div>
-                        <p id="cake-instructions-text"
-                            style="font-size: 11px; color: #555; z-index: 10; margin: 2px 0 8px; font-family: inherit;">
-                            🎂
-                            Drag your finger/cursor inside to slice</p>
-
+                        <div class="retro-title" id="cake-title-text" style="z-index: 10; color: #e85ab5; font-size: clamp(1rem, 4vw, 1.4rem);">Swipe to Cut the Cake!</div>
+                        <p id="cake-instructions-text" style="font-size: 11px; color: #555; z-index: 10; margin: 2px 0 8px; font-family: inherit;">🎂 Drag your finger/cursor inside to slice</p>
+                        
                         <div class="cake-gif-wrapper">
                             <img src="" id="cake-gif-display" alt="Cake celebration animation" class="cake-gif">
                         </div>
 
                         <div id="cake-swipe-hint">KEEP SWIPING</div>
 
-                        <!-- Progress feedback -->
-                        <div class="slice-progress-wrapper" id="slice-progress-wrapper"
-                            style="min-height: 56px; visibility: hidden;">
+                        <div class="slice-progress-wrapper" id="slice-progress-wrapper" style="min-height: 56px; visibility: hidden;">
                             <svg class="slice-progress-svg" viewBox="0 0 120 120">
                                 <circle class="track" cx="60" cy="60" r="52" />
                                 <circle class="bar" id="slice-progress-bar" cx="60" cy="60" r="52" />
                             </svg>
-                            <div class="slice-progress-percentage" id="slice-progress-txt"></div>
+                            <div class="slice-progress-percentage" id="slice-progress-txt">0%</div>
                         </div>
 
-                        <!-- Next Button (unlocked after cut) -->
                         <div id="cake-next-wrapper" style="min-height: 56px; display: none; z-index: 40;">
                             <button class="retro-btn" id="cake-next-btn">
                                 Next
-                                <svg width="18" height="18" viewBox="0 0 24 24">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M5 12h14M12 5l7 7-7 7" />
                                 </svg>
                             </button>
@@ -242,61 +187,47 @@
                     </div>
                 </div>
 
-                <!-- STAGE 3: GALLERY.EXE (PHOTO MEMORIES SLIDER) -->
                 <div class="stage-view" id="stage-gallery">
                     <h2 class="retro-title">Our Memories 🫀</h2>
-                    <p class="retro-subtitle" style="margin-bottom: 12px;">some beautiful moments</p>
+                    <p class="retro-subtitle" style="margin-bottom: 12px;">Swipe through some beautiful moments</p>
 
-                    <!-- Swiper Slide Deck -->
                     <div class="swiper photo-swiper">
                         <div class="swiper-wrapper" id="gallery-slides-wrapper">
-                            <div class="polaroid-card">
+                            <div class="swiper-slide polaroid-card">
                                 <div class="polaroid-img-frame">
-                                    <img src="main.jpeg" alt="Memory asset " loading="lazy">
+                                    <img src="main.jpeg" alt="Memory asset" loading="lazy">
                                 </div>
-                                <div class="polaroid-caption"></div>
+                                <div class="polaroid-caption">A beautiful moment ✨</div>
                             </div>
                         </div>
-                        <!-- Square pagination dots -->
                         <div class="swiper-pagination"></div>
                     </div>
 
-                    <!-- Button revealing letter -->
-                    <div id="gallery-next-wrapper" style="min-height: 50px; visibility: hidden; margin-top: 4px;">
+                    <div id="gallery-next-wrapper" style="min-height: 50px; opacity: 1; margin-top: 4px;">
                         <button class="retro-btn" id="gallery-next-btn">
-                            <!-- Envelop icon inside btn -->
-                            <svg width="16" height="16" viewBox="0 0 24 24"
-                                style="stroke: none; fill: white; margin-bottom: -1px;">
-                                <path
-                                    d="M12 12.713l-11.985-9.713h23.97l-11.985 9.713zm0 2.574l12-9.725v15.438h-24v-15.438l12 9.725z" />
+                            <svg width="16" height="16" viewBox="0 0 24 24" style="stroke: none; fill: white; margin-bottom: -1px;">
+                                <path d="M12 12.713l-11.985-9.713h23.97l-11.985 9.713zm0 2.574l12-9.725v15.438h-24v-15.438l12 9.725z" />
                             </svg>
                             Read Letter
-                            <svg width="16" height="16" viewBox="0 0 24 24">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M5 12h14M12 5l7 7-7 7" />
                             </svg>
                         </button>
                     </div>
                 </div>
 
-                <!-- STAGE 4: LETTER.EXE (SEALED ENVELOPE REVEAL) -->
                 <div class="stage-view" id="stage-letter">
                     <h2 class="retro-title">A Letter For You 💌</h2>
-                    <p class="retro-subtitle" style="margin-bottom: 8px;">Tap the wax seal to open your special message
-                    </p>
+                    <p class="retro-subtitle" style="margin-bottom: 8px;">Tap the wax seal to open your special message</p>
 
-                    <!-- Polaroid Envelope card -->
                     <div class="envelope-card" id="envelope-letter-card">
-                        <!-- Envelope decorative icon -->
                         <svg class="envelope-watermark" viewBox="0 0 24 24" fill="currentColor">
-                            <path
-                                d="M12 12.713l-11.985-9.713h23.97l-11.985 9.713zm0 2.574l12-9.725v15.438h-24v-15.438l12 9.725z" />
+                            <path d="M12 12.713l-11.985-9.713h23.97l-11.985 9.713zm0 2.574l12-9.725v15.438h-24v-15.438l12 9.725z" />
                         </svg>
 
                         <div class="wax-seal">
-                            <!-- Heart icon inside seal -->
                             <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path
-                                    d="M12 4.419c-2.826-5.695-11.999-4.064-11.999 3.27 0 7.27 9.903 10.938 11.999 15.311 2.096-4.373 12-8.041 12-15.311 0-7.327-9.17-8.972-12-3.27z" />
+                                <path d="M12 4.419c-2.826-5.695-11.999-4.064-11.999 3.27 0 7.27 9.903 10.938 11.999 15.311 2.096-4.373 12-8.041 12-15.311 0-7.327-9.17-8.972-12-3.27z" />
                             </svg>
                         </div>
 
@@ -304,12 +235,10 @@
                         <div class="envelope-bottom-lip"></div>
                     </div>
 
-                    <!-- Divider decor -->
-                    <div style="display:flex;align-items:center;width:150px;opacity:0.4;gap:8px;">
+                    <div style="display:flex;align-items:center;width:150px;opacity:0.4;gap:8px;margin-top: 15px;">
                         <div style="flex-grow:1;height:2px;background:#2d132c;"></div>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="#ff5ea6" style="color:#ff5ea6">
-                            <path
-                                d="M12 4.419c-2.826-5.695-11.999-4.064-11.999 3.27 0 7.27 9.903 10.938 11.999 15.311 2.096-4.373 12-8.041 12-15.311 0-7.327-9.17-8.972-12-3.27z" />
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="#ff5ea6">
+                            <path d="M12 4.419c-2.826-5.695-11.999-4.064-11.999 3.27 0 7.27 9.903 10.938 11.999 15.311 2.096-4.373 12-8.041 12-15.311 0-7.327-9.17-8.972-12-3.27z" />
                         </svg>
                         <div style="flex-grow:1;height:2px;background:#2d132c;"></div>
                     </div>
@@ -319,44 +248,29 @@
         </div>
     </div>
 
-    <!-- STAGE 4: RETRO MESSAGE.TXT LETTER MODAL POPUP -->
     <div class="letter-modal-overlay" id="letter-text-modal-overlay">
         <div class="letter-modal">
-
-            <!-- Modal window title bar -->
             <div class="window-header">
                 <span class="window-title" style="color:#2d132c;">MESSAGE.TXT</span>
                 <button class="letter-close-btn" id="letter-modal-close" title="Close letter">×</button>
             </div>
 
-            <!-- Modal Body -->
             <div class="letter-body">
                 <div class="letter-text-box" id="letter-box-scroll">
                     <p class="letter-text" id="typewriter-text"></p>
                 </div>
-
                 <div style="text-align:center;">
-                    <!-- Custom smiley confetti trigger -->
                     <button class="final-smiley-btn" id="final-smiley-btn">◕⩊◕</button>
                 </div>
             </div>
-
         </div>
     </div>
 
-    <!-- Bottom Brand Kaizen Signature -->
     <div class="signature-badge">webkaizen</div>
 
-    <!-- ==========================================
-       JS UTILITY LIBRARIES & LOGIC
-       ========================================== -->
-    <!-- Swiper.js CDN -->
     <script src="swiper.min.js"></script>
-    <!-- canvas-confetti local -->
     <script src="confetti.min.js"></script>
-
     <script src="script.js"></script>
 
 </body>
-
 </html>
