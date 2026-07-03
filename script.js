@@ -77,6 +77,10 @@ I love you forever and ever and ever ♾️😘😘❤️🧿`
     /* Initialize background audio */
     STATE.audio = new Audio(CONFIG.musicUrl);
     STATE.audio.loop = true;
+    console.log("src:", STATE.audio.src);
+console.log("readyState:", STATE.audio.readyState);
+console.log("networkState:", STATE.audio.networkState);
+console.log("error:", STATE.audio.error);
 
     /* Initialize Hearts Particle Spawning */
     const heartsContainer = document.getElementById("hearts-container");
