@@ -10,7 +10,7 @@ try {
     const CONFIG = {
         // Basic Info
         targetName: "My girl",      // Name/pronoun of the birthday recipient
-        age: 16,                    // Age celebrated
+        // age: 20,                    // Age celebrated
 
         // Media Asset URLs (Can point to local paths or CDNs)
         musicUrl: "song.mp3",
@@ -56,7 +56,7 @@ I love you forever and ever and ever ♾️😘😘❤️🧿`
     document.getElementById("loader-display-img").src = CONFIG.loaderImageUrl;
     document.getElementById("intro-gif-display").src = CONFIG.introGifUrl;
     document.getElementById("cake-gif-display").src = CONFIG.cakeGifUrl;
-    document.getElementById("intro-title-text").textContent = `${CONFIG.targetName} was born ${CONFIG.age} years ago today!`;
+    document.getElementById("intro-title-text").textContent = `${CONFIG.targetName} was born 16 years ago today!`;
 
     // Populate Gallery Slides
     //     const slidesWrapper = document.getElementById("gallery-slides-wrapper");
@@ -77,10 +77,6 @@ I love you forever and ever and ever ♾️😘😘❤️🧿`
     /* Initialize background audio */
     STATE.audio = new Audio(CONFIG.musicUrl);
     STATE.audio.loop = true;
-    console.log("src:", STATE.audio.src);
-console.log("readyState:", STATE.audio.readyState);
-console.log("networkState:", STATE.audio.networkState);
-console.log("error:", STATE.audio.error);
 
     /* Initialize Hearts Particle Spawning */
     const heartsContainer = document.getElementById("hearts-container");
@@ -262,26 +258,19 @@ console.log("error:", STATE.audio.error);
     curtainContent.style.pointerEvents = "none";
 
     // 1. Play Background Music with fade-in volume
-STATE.audio.pause();
-STATE.audio.currentTime = 0;
-STATE.audio.volume = 0;
-
-try {
-    await STATE.audio.play();
-
-    let vol = 0;
-    const fade = setInterval(() => {
-        vol += 0.1;
-        if (vol >= 1) {
-            vol = 1;
-            clearInterval(fade);
-        }
-        STATE.audio.volume = vol;
-    }, 100);
-
-} catch (e) {
-    console.error(e);
-}
+    STATE.audio.volume = 0;
+    STATE.audio.play().then(() => {
+        let vol = 0;
+        let fadeTimer = setInterval(() => {
+            if (vol < 0.9) {
+                vol += 0.1;
+                STATE.audio.volume = vol;
+            } else {
+                STATE.audio.volume = 1.0;
+                clearInterval(fadeTimer);
+            }
+        }, 100);
+    }).catch(() => {});
 
     // 2. Open curtains
     const overlay = document.getElementById("curtain-overlay");
