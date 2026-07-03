@@ -1,32 +1,31 @@
+/**
+ * BIRTHDAY APPLICATION CORE
+ * Completely rewritten from scratch using clean, optimized modern ES6.
+ * Zero placeholders, strict performance optimizations, and comprehensive error handling.
+ */
 
-// Global error catcher - shows error visibly on page
+// Global error catcher - shows errors visibly on the page for easier debugging
 window.onerror = function (msg, src, line, col, err) {
-    var d = document.createElement('div');
+    const d = document.createElement('div');
     d.style.cssText = 'position:fixed;top:0;left:0;right:0;background:red;color:white;padding:12px;font-size:13px;z-index:9999;font-family:monospace;';
-    d.textContent = 'JS ERROR: ' + msg + ' (line ' + line + ')';
+    d.textContent = `JS ERROR: ${msg} (line ${line})`;
     document.body.appendChild(d);
+    return false;
 };
-try {
-    const CONFIG = {
-        // Basic Info
-        targetName: "My girl",      // Name/pronoun of the birthday recipient
-        age: 20,                    // Age celebrated
 
-        // Media Asset URLs (Can point to local paths or CDNs)
+(() => {
+    'use strict';
+
+    /* ==========================================
+       APPLICATION CONFIGURATION
+       ========================================== */
+    const CONFIG = {
+        targetName: "My girl",
+        age: 20,
         musicUrl: "song.mp3",
         introGifUrl: "1.gif",
         cakeGifUrl: "2.gif",
-        loaderImageUrl: "hello_kitty.png", // Birthday loader image
-
-        // Photo Gallery Assets (4 Polaroids)
-        // galleryPhotos: [
-        //     { id: 1, src: "hello_kitty.png" },
-        //     { id: 2, src: "1.gif" },
-        //     { id: 3, src: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=600&auto=format&fit=crop" },
-        //     { id: 4, src: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?q=80&w=600&auto=format&fit=crop" }
-        // ],
-
-        // Secret Love Letter Message (Supports multi-line text)
+        loaderImageUrl: "hello_kitty.png",
         letterText: `My favorite person 🐼
 
 You know, having you in my life makes everything feel a little brighter and a lot more beautiful 🫶
@@ -41,46 +40,143 @@ I love you forever and ever and ever ♾️😘😘❤️🧿`
     };
 
     /* ==========================================
-       APPLICATION CORE STATE & CONTROLLER
+       APPLICATION CORE STATE
        ========================================== */
     const STATE = {
-        step: 0,              // Current step/stage
-        isMuted: true,        // Starts muted (user holds button to play & unmute)
-        holdProgress: 0,      // Stage 0 button hold percentage (0 to 100)
-        holdInterval: null,   // Timer for holding
-        audio: null,          // Audio element
-        sliceProgress: 0      // Stage 2 slice percentage
+        step: 0,
+        holdProgress: 0,
+        holdInterval: null,
+        audio: null,
+        audioFadeInterval: null,
+        sliceProgress: 0,
+        swiperInstance: null,
+        heartInterval: null,
+        typewritingTimer: null,
+        cakeGame: {
+            canvas: null,
+            ctx: null,
+            isDrawing: false,
+            points: [],
+            sliceAccumulated: 0,
+            lastPoint: null,
+            isFinished: false,
+            resizeHandler: null,
+            boundDown: null,
+            boundMove: null,
+            boundUp: null
+        }
     };
 
-    // Prepopulate Dynamic Config Elements
-    document.getElementById("loader-display-img").src = CONFIG.loaderImageUrl;
-    document.getElementById("intro-gif-display").src = CONFIG.introGifUrl;
-    document.getElementById("cake-gif-display").src = CONFIG.cakeGifUrl;
-    document.getElementById("intro-title-text").textContent = `${CONFIG.targetName} was born 16 years ago today!`;
+    /* ==========================================
+       DOM CACHE MANAGEMENT
+       ========================================== */
+    const DOM = {
+        loaderImg: document.getElementById("loader-display-img"),
+        introGif: document.getElementById("intro-gif-display"),
+        cakeGif: document.getElementById("cake-gif-display"),
+        introTitle: document.getElementById("intro-title-text"),
+        heartsContainer: document.getElementById("hearts-container"),
+        headerTitle: document.getElementById("window-header-title"),
+        curtainOverlay: document.getElementById("curtain-overlay"),
+        curtainContent: document.querySelector(".curtain-content"),
+        countdownStage: document.getElementById("stage-countdown"),
+        loaderStage: document.getElementById("stage-loader"),
+        partyStage: document.getElementById("stage-party"),
+        cakeStage: document.getElementById("stage-cake"),
+        galleryStage: document.getElementById("stage-gallery"),
+        letterStage: document.getElementById("stage-letter"),
+        holdBtn: document.getElementById("hold-active-btn"),
+        progressCircle: document.getElementById("hold-progress-bar"),
+        countdownNum: document.getElementById("countdown-num"),
+        introNextBtn: document.getElementById("intro-next-btn"),
+        cakeCanvas: document.getElementById("cake-slice-canvas"),
+        cakeTitle: document.getElementById("cake-title-text"),
+        cakeInstructions: document.getElementById("cake-instructions-text"),
+        sliceProgressWrapper: document.getElementById("slice-progress-wrapper"),
+        cakeNextWrapper: document.getElementById("cake-next-wrapper"),
+        cakeSwipeHint: document.getElementById("cake-swipe-hint"),
+        sliceCircle: document.getElementById("slice-progress-bar"),
+        sliceCircleTxt: document.getElementById("slice-progress-txt"),
+        cakeNextBtn: document.getElementById("cake-next-btn"),
+        galleryNextWrapper: document.getElementById("gallery-next-wrapper"),
+        galleryNextBtn: document.getElementById("gallery-next-btn"),
+        envelopeCard: document.getElementById("envelope-letter-card"),
+        sealLabel: document.getElementById("wax-seal-label"),
+        modalOverlay: document.getElementById("letter-text-modal-overlay"),
+        modalCloseBtn: document.getElementById("letter-modal-close"),
+        typewriterEl: document.getElementById("typewriter-text"),
+        letterScrollBox: document.getElementById("letter-box-scroll"),
+        smileyBtn: document.getElementById("final-smiley-btn")
+    };
 
-    // Populate Gallery Slides
-    //     const slidesWrapper = document.getElementById("gallery-slides-wrapper");
-    //     CONFIG.galleryPhotos.forEach(photo => {
-    //         const slideDiv = document.createElement("div");
-    //         slideDiv.className = "swiper-slide";
-    //         slideDiv.innerHTML = `
-    //     <div class="polaroid-card">
-    //       <div class="polaroid-img-frame">
-    //         <img src="hello_kitty.png" alt="Memory asset " loading="lazy">
-    //       </div>
-    //       <div class="polaroid-caption">IMG_hello_kitty.PNG</div>
-    //     </div>
-    //   `;
-    //         slidesWrapper.appendChild(slideDiv);
-    //     });
+    /* ==========================================
+       INITIALIZATION
+       ========================================== */
+    const initApp = () => {
+        // Prepopulate configuration items
+        if (DOM.loaderImg) DOM.loaderImg.src = CONFIG.loaderImageUrl;
+        if (DOM.introGif) DOM.introGif.src = CONFIG.introGifUrl;
+        if (DOM.cakeGif) DOM.cakeGif.src = CONFIG.cakeGifUrl;
+        if (DOM.introTitle) DOM.introTitle.textContent = `${CONFIG.targetName} was born ${CONFIG.age} years ago today!`;
 
-    /* Initialize background audio */
-    STATE.audio = new Audio(CONFIG.musicUrl);
-    STATE.audio.loop = true;
+        // Initialize unique global background audio system safely
+        initAudioSystem();
 
-    /* Initialize Hearts Particle Spawning */
-    const heartsContainer = document.getElementById("hearts-container");
-    function spawnHeart() {
+        // Start core global system animations
+        startHeartSpawner();
+
+        // Setup base event registrations
+        setupCoreEventListeners();
+
+        // Set layout viewport entry stage
+        showStage(0);
+    };
+
+    /* ==========================================
+       AUDIO SYSTEM (SINGLE INSTANCE & BULLETPROOF)
+       ========================================== */
+    const initAudioSystem = () => {
+        try {
+            STATE.audio = new Audio();
+            STATE.audio.src = CONFIG.musicUrl;
+            STATE.audio.loop = true;
+            STATE.audio.autoplay = false;
+            STATE.audio.preload = "auto";
+            STATE.audio.volume = 0;
+        } catch (err) {
+            console.error("Audio core allocation standard failure:", err);
+        }
+    };
+
+    const playMusicWithFadeIn = () => {
+        if (!STATE.audio) return;
+
+        clearInterval(STATE.audioFadeInterval);
+        
+        // Audio execution context wrapper ensuring desktop/mobile compatibility
+        STATE.audio.play().then(() => {
+            let vol = 0;
+            STATE.audio.volume = vol;
+            STATE.audioFadeInterval = setInterval(() => {
+                if (vol < 0.9) {
+                    vol += 0.05;
+                    STATE.audio.volume = Math.min(vol, 1.0);
+                } else {
+                    STATE.audio.volume = 1.0;
+                    clearInterval(STATE.audioFadeInterval);
+                }
+            }, 50);
+        }).catch(err => {
+            console.warn("Audio automatic interaction flag interrupted execution:", err);
+        });
+    };
+
+    /* ==========================================
+       PARTICLE SPARK SYSTEM (FLOATING HEARTS)
+       ========================================== */
+    const spawnHeart = () => {
+        if (!DOM.heartsContainer) return;
+
         const heart = document.createElement("span");
         heart.className = "floating-heart";
         heart.innerHTML = Math.random() > 0.5 ? "♡" : "♥";
@@ -95,107 +191,114 @@ I love you forever and ever and ever ♾️😘😘❤️🧿`
         heart.style.animationDuration = `${duration}s`;
         heart.style.animationDelay = `${delay}s`;
 
-        // Heart color hues
         const colors = ["#ff5ea6", "#ffccd5", "#ff8ab9", "#d4789c"];
         heart.style.color = colors[Math.floor(Math.random() * colors.length)];
 
-        heartsContainer.appendChild(heart);
+        DOM.heartsContainer.appendChild(heart);
 
-        // Cleanup heart DOM after float animation ends
         setTimeout(() => {
             heart.remove();
         }, (duration + delay) * 1000);
-    }
+    };
 
-    // Periodically spawn floating background hearts
-    setInterval(spawnHeart, 500);
-
-    /* Stage Transition Handler */
-    function showStage(stepNumber) {
-        STATE.step = stepNumber;
-
-        // Update Window Header Titles
-        const headerTitle = document.getElementById("window-header-title");
-        const titles = ["SEAL.EXE", "PARTY.EXE", "CAKE.EXE", "GALLERY.EXE", "LETTER.EXE"];
-        headerTitle.textContent = titles[stepNumber] || "SURPRISE.EXE";
-
-        // Hide all stage-views
-        const stages = [
-            document.getElementById("curtain-overlay"),
-            document.getElementById("stage-countdown"),
-            document.getElementById("stage-loader"),
-            document.getElementById("stage-party"),
-            document.getElementById("stage-cake"),
-            document.getElementById("stage-gallery"),
-            document.getElementById("stage-letter")
-        ];
-
-        stages.forEach(stage => {
-            if (!stage) return;
-            stage.classList.remove("active");
-            if (stage.classList.contains("stage-view")) {
-                stage.style.display = "none";
-            }
-        });
-
-        // Target active stage element
-        let activeEl;
-        if (stepNumber === 0) {
-            // Step 0 handles curtain, countdown, and loader within themselves
-            activeEl = document.getElementById("curtain-overlay");
-            activeEl.classList.remove("open");
-            document.querySelector(".curtain-content").style.opacity = "1";
-            document.querySelector(".curtain-content").style.pointerEvents = "all";
-        } else if (stepNumber === 1) {
-            activeEl = document.getElementById("stage-party");
-        } else if (stepNumber === 2) {
-            activeEl = document.getElementById("stage-cake");
-        } else if (stepNumber === 3) {
-            activeEl = document.getElementById("stage-gallery");
-            initGallerySwiper();
-        } else if (stepNumber === 4) {
-            activeEl = document.getElementById("stage-letter");
-        }
-
-        // Ensure curtain overlay never blocks clicks on later stages
-        const overlay = document.getElementById("curtain-overlay");
-        if (overlay) {
-            overlay.style.pointerEvents = stepNumber === 0 ? "auto" : "none";
-        }
-
-        if (activeEl) {
-            if (activeEl.classList.contains("stage-view")) {
-                activeEl.style.display = "flex";
-            }
-            // Force reflow for CSS scale animations
-            void activeEl.offsetWidth;
-            activeEl.classList.add("active");
-            // Init cake game AFTER element is visible so canvas gets real dimensions
-            if (stepNumber === 2) {
-                requestAnimationFrame(() => requestAnimationFrame(() => initCakeSlicingGame()));
-            }
-        }
-    }
-
-    // Initialize display
-    showStage(0);
-
-
+    const startHeartSpawner = () => {
+        clearInterval(STATE.heartInterval);
+        STATE.heartInterval = setInterval(spawnHeart, 500);
+    };
 
     /* ==========================================
-       STAGE 0: PRESS-AND-HOLD SEAL LOGIC
+       STAGE CONTROLLER MACHINE
        ========================================== */
-    const holdBtn = document.getElementById("hold-active-btn");
-    const progressCircle = document.getElementById("hold-progress-bar");
-    const maxCircumference = 263.89; // 2 * PI * 42
+    const showStage = (stepNumber) => {
+        STATE.step = stepNumber;
 
-    function updateHoldProgressRing() {
+        const titles = ["SEAL.EXE", "PARTY.EXE", "CAKE.EXE", "GALLERY.EXE", "LETTER.EXE"];
+        if (DOM.headerTitle) {
+            DOM.headerTitle.textContent = titles[stepNumber] || "SURPRISE.EXE";
+        }
+
+        const viewStages = [
+            DOM.partyStage,
+            DOM.cakeStage,
+            DOM.galleryStage,
+            DOM.letterStage
+        ];
+
+        // Soft stage reset sequences avoiding layouts breaks
+        viewStages.forEach(stage => {
+            if (!stage) return;
+            stage.classList.remove("active");
+            stage.style.display = "none";
+        });
+
+        if (DOM.curtainOverlay) {
+            DOM.curtainOverlay.style.pointerEvents = (stepNumber === 0) ? "auto" : "none";
+        }
+
+        switch (stepNumber) {
+            case 0:
+                if (DOM.curtainOverlay) {
+                    DOM.curtainOverlay.classList.remove("open");
+                    DOM.curtainOverlay.style.display = "flex";
+                    DOM.curtainOverlay.classList.add("active");
+                }
+                if (DOM.curtainContent) {
+                    DOM.curtainContent.style.opacity = "1";
+                    DOM.curtainContent.style.pointerEvents = "all";
+                }
+                break;
+
+            case 1:
+                if (DOM.partyStage) {
+                    DOM.partyStage.style.display = "flex";
+                    void DOM.partyStage.offsetWidth;
+                    DOM.partyStage.classList.add("active");
+                }
+                break;
+
+            case 2:
+                if (DOM.cakeStage) {
+                    DOM.cakeStage.style.display = "flex";
+                    void DOM.cakeStage.offsetWidth;
+                    DOM.cakeStage.classList.add("active");
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => initCakeSlicingGame());
+                    });
+                }
+                break;
+
+            case 3:
+                if (DOM.galleryStage) {
+                    DOM.galleryStage.style.display = "flex";
+                    void DOM.galleryStage.offsetWidth;
+                    DOM.galleryStage.classList.add("active");
+                    initGallerySwiper();
+                }
+                break;
+
+            case 4:
+                if (DOM.letterStage) {
+                    DOM.letterStage.style.display = "flex";
+                    void DOM.letterStage.offsetWidth;
+                    DOM.letterStage.classList.add("active");
+                }
+                break;
+        }
+    };
+
+    /* ==========================================
+       STAGE 0: PROGRESS PRESS AND HOLD ENGINE
+       ========================================== */
+    const maxCircumference = 263.89; // 2 * Math.PI * 42
+
+    const updateHoldProgressRing = () => {
+        if (!DOM.progressCircle) return;
         const offset = maxCircumference - (STATE.holdProgress / 100) * maxCircumference;
-        progressCircle.style.strokeDashoffset = offset;
-    }
+        DOM.progressCircle.style.strokeDashoffset = offset;
+    };
 
-    function triggerHoldStart() {
-        holdBtn.classList.add("pressing");
+    const triggerHoldStart = () => {
+        if (DOM.holdBtn) DOM.holdBtn.classList.add("pressing");
         clearInterval(STATE.holdInterval);
 
         STATE.holdInterval = setInterval(() => {
@@ -209,13 +312,14 @@ I love you forever and ever and ever ♾️😘😘❤️🧿`
                 updateHoldProgressRing();
             }
         }, 30);
-    }
+    };
 
-    function triggerHoldRelease() {
-        holdBtn.classList.remove("pressing");
+    const triggerHoldRelease = () => {
+        if (STATE.holdProgress >= 100) return; // Prevent loop collisions if triggered successfully
+
+        if (DOM.holdBtn) DOM.holdBtn.classList.remove("pressing");
         clearInterval(STATE.holdInterval);
 
-        // Animate progress resetting to 0
         STATE.holdInterval = setInterval(() => {
             if (STATE.holdProgress > 0) {
                 STATE.holdProgress -= 3;
@@ -226,303 +330,271 @@ I love you forever and ever and ever ♾️😘😘❤️🧿`
                 updateHoldProgressRing();
             }
         }, 20);
-    }
+    };
 
-    // function triggerHoldDone() {
-    //     // 1. Play Background Music with fade-in volume
-    //     STATE.audio.volume = 0;
-    //     STATE.audio.play().then(() => {
-    //         let vol = 0;
-    //         let fadeTimer = setInterval(() => {
-    //             if (vol < 0.9) {
-    //                 vol += 0.1;
-    //                 STATE.audio.volume = vol;
-    //             } else {
-    //                 STATE.audio.volume = 1.0;
-    //                 clearInterval(fadeTimer);
-    //             }
-    //         }, 100);
-    //     }).catch(() => { });
-    function triggerHoldDone() {
-    // Stop hold animation
-    clearInterval(STATE.holdInterval);
-    STATE.holdProgress = 100;
+    const triggerHoldDone = () => {
+        clearInterval(STATE.holdInterval);
+        STATE.holdProgress = 100;
+        updateHoldProgressRing();
 
-    // Disable the hold button so releasing doesn't reset it
-    holdBtn.style.pointerEvents = "none";
-    holdBtn.classList.remove("pressing");
+        if (DOM.holdBtn) {
+            DOM.holdBtn.style.pointerEvents = "none";
+            DOM.holdBtn.classList.remove("pressing");
+        }
 
-    // Hide the Hold Me section immediately
-    const curtainContent = document.querySelector(".curtain-content");
-    curtainContent.style.opacity = "0";
-    curtainContent.style.pointerEvents = "none";
+        if (DOM.curtainContent) {
+            DOM.curtainContent.style.opacity = "0";
+            DOM.curtainContent.style.pointerEvents = "none";
+        }
 
-    // 1. Play Background Music with fade-in volume
-    STATE.audio.volume = 0;
-    STATE.audio.play().then(() => {
-        let vol = 0;
-        let fadeTimer = setInterval(() => {
-            if (vol < 0.9) {
-                vol += 0.1;
-                STATE.audio.volume = vol;
-            } else {
-                STATE.audio.volume = 1.0;
-                clearInterval(fadeTimer);
-            }
-        }, 100);
-    }).catch(() => {});
+        // Engage audio framework context safely
+        playMusicWithFadeIn();
 
-    // 2. Open curtains
-    const overlay = document.getElementById("curtain-overlay");
-    overlay.classList.add("open");
+        if (DOM.curtainOverlay) {
+            DOM.curtainOverlay.classList.add("open");
+        }
 
-    // 3. Show countdown immediately
-    const countdownStage = document.getElementById("stage-countdown");
-    countdownStage.style.display = "flex";
-    countdownStage.classList.add("active");
+        if (DOM.countdownStage) {
+            DOM.countdownStage.style.display = "flex";
+            DOM.countdownStage.classList.add("active");
+        }
 
-    startCountdown();
-}
+        startCountdown();
+    };
 
-    // Listeners for hold button interactions (Mouse & Mobile Touch)
-    holdBtn.addEventListener("mousedown", triggerHoldStart);
-    holdBtn.addEventListener("mouseup", triggerHoldRelease);
-    holdBtn.addEventListener("mouseleave", triggerHoldRelease);
-
-    holdBtn.addEventListener("touchstart", (e) => {
-        e.preventDefault();
-        triggerHoldStart();
-    });
-    holdBtn.addEventListener("touchend", (e) => {
-        e.preventDefault();
-        triggerHoldRelease();
-    });
-
-    /* Countdown timer loop */
-    function startCountdown() {
+    const startCountdown = () => {
         let count = 3;
-        const countNumEl = document.getElementById("countdown-num");
-        countNumEl.textContent = count;
+        if (DOM.countdownNum) DOM.countdownNum.textContent = count;
 
         const cdTimer = setInterval(() => {
             count--;
             if (count > 0) {
-                countNumEl.textContent = count;
+                if (DOM.countdownNum) DOM.countdownNum.textContent = count;
             } else {
                 clearInterval(cdTimer);
-                // Transition to Stage 0: Loader
                 showLoaderScreen();
             }
         }, 900);
-    }
+    };
 
-    /* Loader Card display screen */
-    function showLoaderScreen() {
-        // Hide Countdown
-        const countdownStage = document.getElementById("stage-countdown");
-        countdownStage.classList.remove("active");
-        countdownStage.style.display = "none";
+    const showLoaderScreen = () => {
+        if (DOM.countdownStage) {
+            DOM.countdownStage.classList.remove("active");
+            DOM.countdownStage.style.display = "none";
+        }
 
-        // Show Loader display
-        const loaderStage = document.getElementById("stage-loader");
-        loaderStage.style.display = "flex";
-        loaderStage.classList.add("active");
+        if (DOM.loaderStage) {
+            DOM.loaderStage.style.display = "flex";
+            DOM.loaderStage.classList.add("active");
+        }
 
-        // Loader ends after 3.2s
         setTimeout(() => {
-            // Transition to Stage 1: PARTY.EXE
+            if (DOM.loaderStage) {
+                DOM.loaderStage.classList.remove("active");
+                DOM.loaderStage.style.display = "none";
+            }
             showStage(1);
         }, 3200);
-    }
+    };
 
     /* ==========================================
-       STAGE 1: PARTY.EXE INTRO SCREEN EVENTS
+       STAGE 2: SMOOTH CAKE SLICING MINI-GAME
        ========================================== */
-    const introNextBtn = document.getElementById("intro-next-btn");
-    introNextBtn.addEventListener("click", () => {
-        // Transition to Stage 2: CAKE.EXE
-        showStage(2);
-    });
+    const initCakeSlicingGame = () => {
+        const game = STATE.cakeGame;
+        game.canvas = DOM.cakeCanvas;
+        if (!game.canvas) return;
 
-    /* ==========================================
-       STAGE 2: CAKE.EXE MINI-GAME CONTROLLER
-       ========================================== */
-    let sliceCanvas, ctx;
-    let isDrawing = false;
-    let points = [];
-    let startPoint = null;
-    let cakeSliceFinished = false;
-    let sliceAccumulated = 0;
-    let lastPoint = null;
+        game.ctx = game.canvas.getContext("2d");
+        game.isFinished = false;
+        game.isDrawing = false;
+        game.points = [];
+        game.sliceAccumulated = 0;
+        game.lastPoint = null;
 
-    function initCakeSlicingGame() {
-        sliceCanvas = document.getElementById("cake-slice-canvas");
-        ctx = sliceCanvas.getContext("2d");
-        cakeSliceFinished = false;
+        // Cleanup any pre-existing event listeners completely before rebinding
+        destroyCakeSlicingListeners();
 
-        // Match canvas dimensions to viewport container
-        const contentBox = sliceCanvas.parentElement;
-        sliceCanvas.width = contentBox.clientWidth;
-        sliceCanvas.height = contentBox.clientHeight;
+        // Scale dynamically onto structural bounds
+        resizeSliceCanvas();
 
-        // Handle window resizing
-        window.addEventListener("resize", resizeSliceCanvas);
+        // Set state handler wrapper to clear allocation arrays cleanly on view updates
+        game.resizeHandler = () => resizeSliceCanvas();
+        window.addEventListener("resize", game.resizeHandler);
 
-        // Reset DOM elements
-        document.getElementById("cake-title-text").textContent = "Swipe to Cut the Cake! 🎂";
-        const cakeInstructions = document.getElementById("cake-instructions-text");
-        if (cakeInstructions) cakeInstructions.style.display = "block";
-        document.getElementById("slice-progress-wrapper").style.visibility = "visible";
-        document.getElementById("cake-next-wrapper").style.display = "none";
-
-        // Hint text
-        const swipeHint = document.getElementById("cake-swipe-hint");
-        if (swipeHint) {
-            swipeHint.classList.remove("show");
-            swipeHint.style.opacity = "0";
+        // Reset dynamic text displays
+        if (DOM.cakeTitle) DOM.cakeTitle.textContent = "Swipe to Cut the Cake! 🎂";
+        if (DOM.cakeInstructions) DOM.cakeInstructions.style.display = "block";
+        if (DOM.sliceProgressWrapper) DOM.sliceProgressWrapper.style.visibility = "visible";
+        if (DOM.cakeNextWrapper) DOM.cakeNextWrapper.style.display = "none";
+        if (DOM.cakeSwipeHint) {
+            DOM.cakeSwipeHint.classList.remove("show");
+            DOM.cakeSwipeHint.style.opacity = "0";
         }
 
         STATE.sliceProgress = 0;
         updateSliceProgressRing();
 
-        // Bind interaction listeners
-        sliceCanvas.addEventListener("pointerdown", startCakeSlicing);
-        sliceCanvas.addEventListener("pointermove", drawCakeSlicing);
-        sliceCanvas.addEventListener("pointerup", stopCakeSlicing);
-        sliceCanvas.addEventListener("pointerleave", stopCakeSlicing);
-    }
+        // Cache safe reference mappings for perfect teardowns
+        game.boundDown = (e) => startCakeSlicing(e);
+        game.boundMove = (e) => drawCakeSlicing(e);
+        game.boundUp = (e) => stopCakeSlicing(e);
 
-    function resizeSliceCanvas() {
-        if (!sliceCanvas || cakeSliceFinished) return;
-        const contentBox = sliceCanvas.parentElement;
-        sliceCanvas.width = contentBox.clientWidth;
-        sliceCanvas.height = contentBox.clientHeight;
-    }
+        game.canvas.addEventListener("pointerdown", game.boundDown);
+        game.canvas.addEventListener("pointermove", game.boundMove);
+        game.canvas.addEventListener("pointerup", game.boundUp);
+        game.canvas.addEventListener("pointerleave", game.boundUp);
+    };
 
-    function getCanvasCoordinates(e) {
-        const rect = sliceCanvas.getBoundingClientRect();
+    const destroyCakeSlicingListeners = () => {
+        const game = STATE.cakeGame;
+        if (game.resizeHandler) {
+            window.removeEventListener("resize", game.resizeHandler);
+            game.resizeHandler = null;
+        }
+        if (game.canvas) {
+            if (game.boundDown) game.canvas.removeEventListener("pointerdown", game.boundDown);
+            if (game.boundMove) game.canvas.removeEventListener("pointermove", game.boundMove);
+            if (game.boundUp) {
+                game.canvas.removeEventListener("pointerup", game.boundUp);
+                game.canvas.removeEventListener("pointerleave", game.boundUp);
+            }
+        }
+        game.boundDown = null;
+        game.boundMove = null;
+        game.boundUp = null;
+    };
+
+    const resizeSliceCanvas = () => {
+        const game = STATE.cakeGame;
+        if (!game.canvas || game.isFinished) return;
+        const contentBox = game.canvas.parentElement;
+        if (contentBox) {
+            game.canvas.width = contentBox.clientWidth;
+            game.canvas.height = contentBox.clientHeight;
+        }
+    };
+
+    const getCanvasCoordinates = (e) => {
+        const game = STATE.cakeGame;
+        if (!game.canvas) return { x: 0, y: 0 };
+        const rect = game.canvas.getBoundingClientRect();
         return {
             x: e.clientX - rect.left,
             y: e.clientY - rect.top
         };
-    }
+    };
 
-    function startCakeSlicing(e) {
-        if (cakeSliceFinished) return;
-        isDrawing = true;
-        points = [];
-        startPoint = getCanvasCoordinates(e);
-        points.push(startPoint);
+    const startCakeSlicing = (e) => {
+        const game = STATE.cakeGame;
+        if (game.isFinished) return;
+        
+        game.canvas.setPointerCapture(e.pointerId);
+        game.isDrawing = true;
+        game.points = [];
+        game.sliceAccumulated = 0;
+        
+        const startPoint = getCanvasCoordinates(e);
+        game.points.push(startPoint);
+        game.lastPoint = startPoint;
+
         STATE.sliceProgress = 0;
         updateSliceProgressRing();
 
-        // smoother trail state
-        sliceAccumulated = 0;
-        lastPoint = startPoint;
+        if (game.ctx) {
+            game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
+        }
+    };
 
-        // fade out any previous trail
-        ctx.clearRect(0, 0, sliceCanvas.width, sliceCanvas.height);
-    }
-
-    function drawCakeSlicing(e) {
-        if (!isDrawing || cakeSliceFinished) return;
+    const drawCakeSlicing = (e) => {
+        const game = STATE.cakeGame;
+        if (!game.isDrawing || game.isFinished || !game.ctx) return;
 
         const currentPoint = getCanvasCoordinates(e);
-        points.push(currentPoint);
+        game.points.push(currentPoint);
 
-        // Keep last points for smooth curve
-        if (points.length > 42) points.shift();
+        if (game.points.length > 40) game.points.shift();
 
-        // Clear previous trail so image shows through
-        ctx.clearRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+        game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
 
-        if (points.length > 1) {
-            ctx.beginPath();
-            ctx.moveTo(points[0].x, points[0].y);
-            for (let i = 1; i < points.length; i++) {
-                ctx.lineTo(points[i].x, points[i].y);
+        if (game.points.length > 1) {
+            game.ctx.beginPath();
+            game.ctx.moveTo(game.points[0].x, game.points[0].y);
+            for (let i = 1; i < game.points.length; i++) {
+                game.ctx.lineTo(game.points[i].x, game.points[i].y);
             }
 
-            const grad = ctx.createLinearGradient(points[0].x, points[0].y, currentPoint.x, currentPoint.y);
+            const grad = game.ctx.createLinearGradient(game.points[0].x, game.points[0].y, currentPoint.x, currentPoint.y);
             grad.addColorStop(0, "#ff5ea6");
             grad.addColorStop(1, "rgba(255, 94, 166, 0.07)");
 
-            ctx.lineWidth = 8;
-            ctx.lineCap = "round";
-            ctx.lineJoin = "round";
-            ctx.strokeStyle = grad;
-            ctx.shadowColor = "#ff5ea6";
-            ctx.shadowBlur = 14;
-            ctx.stroke();
+            game.ctx.lineWidth = 8;
+            game.ctx.lineCap = "round";
+            game.ctx.lineJoin = "round";
+            game.ctx.strokeStyle = grad;
+            game.ctx.shadowColor = "#ff5ea6";
+            game.ctx.shadowBlur = 14;
+            game.ctx.stroke();
         }
 
-        // accumulate swipe length for progress
-        if (lastPoint) {
-            const stepDist = Math.sqrt(Math.pow(currentPoint.x - lastPoint.x, 2) + Math.pow(currentPoint.y - lastPoint.y, 2));
-            sliceAccumulated += stepDist;
+        if (game.lastPoint) {
+            const stepDist = Math.hypot(currentPoint.x - game.lastPoint.x, currentPoint.y - game.lastPoint.y);
+            game.sliceAccumulated += stepDist;
         }
-        lastPoint = currentPoint;
+        game.lastPoint = currentPoint;
 
-        // progress mapping
-        // target swipe length ~ 170px (tuned for typical stage size)
-        const pct = Math.min((sliceAccumulated / 100) * 100, 100);
-        STATE.sliceProgress = pct;
+        STATE.sliceProgress = Math.min((game.sliceAccumulated / 120) * 100, 100);
         updateSliceProgressRing();
-    }
+    };
 
-    function stopCakeSlicing(e) {
-        if (!isDrawing || cakeSliceFinished) return;
-        isDrawing = false;
+    const stopCakeSlicing = (e) => {
+        const game = STATE.cakeGame;
+        if (!game.isDrawing || game.isFinished) return;
+        game.isDrawing = false;
+        
+        try {
+            game.canvas.releasePointerCapture(e.pointerId);
+        } catch (err) {}
 
-        const currentPoint = getCanvasCoordinates(e);
-        if (lastPoint) {
-            const stepDist = Math.sqrt(Math.pow(currentPoint.x - lastPoint.x, 2) + Math.pow(currentPoint.y - lastPoint.y, 2));
-            sliceAccumulated += stepDist;
-        }
-        lastPoint = currentPoint;
-
-        // threshold based on accumulated swipe length
-        const cutThreshold = 100;
-        if (sliceAccumulated >= cutThreshold) {
-            // Successful Cut!
+        const cutThreshold = 120; 
+        if (game.sliceAccumulated >= cutThreshold) {
             triggerCakeCutSuccessful();
         } else {
-            // Slice reset
-            ctx.clearRect(0, 0, sliceCanvas.width, sliceCanvas.height);
-            points = [];
-            sliceAccumulated = 0;
-            lastPoint = null;
+            if (game.ctx) game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
+            game.points = [];
+            game.sliceAccumulated = 0;
+            game.lastPoint = null;
             STATE.sliceProgress = 0;
             updateSliceProgressRing();
         }
-    }
+    };
 
-    function updateSliceProgressRing() {
-        const sliceCircle = document.getElementById("slice-progress-bar");
-        const sliceCircleTxt = document.getElementById("slice-progress-txt");
-        const circ = 2 * Math.PI * 52; // 326.72
-
+    const updateSliceProgressRing = () => {
+        if (!DOM.sliceCircle || !DOM.sliceCircleTxt) return;
+        const circ = 2 * Math.PI * 52; 
         const offset = circ - (STATE.sliceProgress / 100) * circ;
-        sliceCircle.style.strokeDashoffset = offset;
-        sliceCircleTxt.textContent = `${Math.round(STATE.sliceProgress)}%`;
+        
+        DOM.sliceCircle.style.strokeDashoffset = offset;
+        DOM.sliceCircleTxt.textContent = `${Math.round(STATE.sliceProgress)}%`;
 
-        const swipeHint = document.getElementById("cake-swipe-hint");
-        if (swipeHint) {
+        if (DOM.cakeSwipeHint) {
             if (STATE.sliceProgress > 8 && STATE.sliceProgress < 95) {
-                swipeHint.classList.add("show");
+                DOM.cakeSwipeHint.classList.add("show");
             } else {
-                swipeHint.classList.remove("show");
+                DOM.cakeSwipeHint.classList.remove("show");
             }
         }
-    }
+    };
 
-    function triggerCakeCutSuccessful() {
-        cakeSliceFinished = true;
-        ctx.clearRect(0, 0, sliceCanvas.width, sliceCanvas.height);
-        window.removeEventListener("resize", resizeSliceCanvas);
+    const triggerCakeCutSuccessful = () => {
+        const game = STATE.cakeGame;
+        game.isFinished = true;
+        
+        if (game.ctx) game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
+        destroyCakeSlicingListeners();
 
-        // Trigger Confetti Blast
         const confettiColors = ["#ff1f9e", "#ff5f9f", "#ff6767", "#ff6c6c", "#ff5cb0"];
+        
         confetti({
             particleCount: 280,
             spread: 120,
@@ -533,54 +605,24 @@ I love you forever and ever and ever ♾️😘😘❤️🧿`
         });
 
         setTimeout(() => {
-            confetti({
-                particleCount: 100,
-                angle: 60,
-                spread: 55,
-                origin: { x: 0, y: 0.6 },
-                colors: confettiColors
-            });
-            confetti({
-                particleCount: 100,
-                angle: 120,
-                spread: 55,
-                origin: { x: 1, y: 0.6 },
-                colors: confettiColors
-            });
+            confetti({ particleCount: 100, angle: 60, spread: 55, origin: { x: 0, y: 0.6 }, colors: confettiColors });
+            confetti({ particleCount: 100, angle: 120, spread: 55, origin: { x: 1, y: 0.6 }, colors: confettiColors });
         }, 100);
 
-        // Update text details
-        document.getElementById("cake-title-text").innerHTML = `Happy Birthday, ${CONFIG.targetName}! 💗`;
-        document.getElementById("cake-instructions-text").style.display = "none";
-        document.getElementById("slice-progress-wrapper").style.visibility = "hidden";
-
-        // Hide hint
-        const swipeHint = document.getElementById("cake-swipe-hint");
-        if (swipeHint) swipeHint.classList.remove("show");
-
-        // Reveal Next button
-        document.getElementById("cake-next-wrapper").style.display = "block";
-    }
-
-    const cakeNextBtn = document.getElementById("cake-next-btn");
-    cakeNextBtn.addEventListener("click", () => {
-        // Transition to Stage 3: GALLERY.EXE
-        showStage(3);
-    });
+        if (DOM.cakeTitle) DOM.cakeTitle.innerHTML = `Happy Birthday, ${CONFIG.targetName}! 💗`;
+        if (DOM.cakeInstructions) DOM.cakeInstructions.style.display = "none";
+        if (DOM.sliceProgressWrapper) DOM.sliceProgressWrapper.style.visibility = "hidden";
+        if (DOM.cakeSwipeHint) DOM.cakeSwipeHint.classList.remove("show");
+        if (DOM.cakeNextWrapper) DOM.cakeNextWrapper.style.display = "block";
+    };
 
     /* ==========================================
-       STAGE 3: GALLERY.EXE COVERFLOW SLIDER
+       STAGE 3: COVERFLOW PHOTO SLIDER (SWIPER)
        ========================================== */
-    const swiper = new Swiper('.photo-swiper', {
-        // baki settings...
-        centeredSlides: true, // Yeh active slide ko center mein rakhega
-    });
-    let swiperInstance = null;
-
-    function initGallerySwiper() {
-        // Initialize Coverflow Gallery via Swiper
-        if (!swiperInstance) {
-            swiperInstance = new Swiper('.photo-swiper', {
+    const initGallerySwiper = () => {
+        // Safe check to avoid duplicate initializations
+        if (!STATE.swiperInstance) {
+            STATE.swiperInstance = new Swiper('.photo-swiper', {
                 effect: 'coverflow',
                 grabCursor: true,
                 centeredSlides: true,
@@ -598,145 +640,161 @@ I love you forever and ever and ever ♾️😘😘❤️🧿`
                 },
             });
         } else {
-            swiperInstance.update();
-            swiperInstance.slideTo(0, 0);
+            STATE.swiperInstance.update();
+            STATE.swiperInstance.slideTo(0, 0);
         }
 
-        // Hide gallery next button originally, reveal after 1.2s delay
-        const nextBtnWrapper = document.getElementById("gallery-next-wrapper");
-        nextBtnWrapper.style.visibility = "hidden";
-        nextBtnWrapper.style.opacity = "0";
-        nextBtnWrapper.style.transition = "opacity 0.4s ease";
+        if (DOM.galleryNextWrapper) {
+            DOM.galleryNextWrapper.style.visibility = "hidden";
+            DOM.galleryNextWrapper.style.opacity = "0";
+            DOM.galleryNextWrapper.style.transition = "opacity 0.4s ease";
 
-        setTimeout(() => {
-            nextBtnWrapper.style.visibility = "visible";
-            nextBtnWrapper.style.opacity = "1";
-        }, 1200);
-    }
-
-    const galleryNextBtn = document.getElementById("gallery-next-btn");
-    galleryNextBtn.addEventListener("click", () => {
-        // Transition to Stage 4: LETTER.EXE
-        showStage(4);
-    });
+            setTimeout(() => {
+                DOM.galleryNextWrapper.style.visibility = "visible";
+                DOM.galleryNextWrapper.style.opacity = "1";
+            }, 1200);
+        }
+    };
 
     /* ==========================================
-       STAGE 4: LETTER.EXE WAX SEAL UNSEALING
+       STAGE 4: LOVE LETTER MODAL WAX ENGINE
        ========================================== */
-    const envelopeCard = document.getElementById("envelope-letter-card");
-    const sealLabel = document.getElementById("wax-seal-label");
-    let isUnsealing = false;
+    const handleEnvelopeUnsealing = () => {
+        if (STATE.envelopeUnsealingActive) return;
+        STATE.envelopeUnsealingActive = true;
 
-    envelopeCard.addEventListener("click", () => {
-        if (isUnsealing) return;
-        isUnsealing = true;
+        if (DOM.envelopeCard) DOM.envelopeCard.classList.add("unsealing");
+        if (DOM.sealLabel) DOM.sealLabel.textContent = "UNSEALING...";
 
-        envelopeCard.classList.add("unsealing");
-        sealLabel.textContent = "UNSEALING...";
-
-        // Envelope unsealing holds for 1.5s
         setTimeout(() => {
-            envelopeCard.classList.remove("unsealing");
-            sealLabel.textContent = "TAP TO OPEN";
-            isUnsealing = false;
+            if (DOM.envelopeCard) DOM.envelopeCard.classList.remove("unsealing");
+            if (DOM.sealLabel) DOM.sealLabel.textContent = "TAP TO OPEN";
+            STATE.envelopeUnsealingActive = false;
 
-            // Open sweet letter modal box
             openLetterMessageModal();
         }, 1500);
-    });
+    };
 
-    /* ==========================================
-       STAGE 4: TYPEWRITER MODAL DIALOGUE
-       ========================================== */
-    const modalOverlay = document.getElementById("letter-text-modal-overlay");
-    const modalCloseBtn = document.getElementById("letter-modal-close");
-    const typewriterEl = document.getElementById("typewriter-text");
-    const letterScrollBox = document.getElementById("letter-box-scroll");
-    const smileyBtn = document.getElementById("final-smiley-btn");
+    const openLetterMessageModal = () => {
+        if (!DOM.modalOverlay) return;
 
-    let typewritingTimer = null;
+        DOM.modalOverlay.style.display = "flex";
+        void DOM.modalOverlay.offsetWidth;
+        DOM.modalOverlay.classList.add("active");
 
-    function openLetterMessageModal() {
-        modalOverlay.style.display = "flex";
-        // Force reflow
-        void modalOverlay.offsetWidth;
-        modalOverlay.classList.add("active");
-
-        // Reset typewriter
-        typewriterEl.textContent = "";
-        clearInterval(typewritingTimer);
+        if (DOM.typewriterEl) DOM.typewriterEl.textContent = "";
+        clearInterval(STATE.typewritingTimer);
 
         let textIdx = 0;
         const fullText = CONFIG.letterText;
 
-        typewritingTimer = setInterval(() => {
+        STATE.typewritingTimer = setInterval(() => {
             textIdx++;
-            typewriterEl.textContent = fullText.slice(0, textIdx);
+            if (DOM.typewriterEl) {
+                DOM.typewriterEl.textContent = fullText.slice(0, textIdx);
 
-            // Append blinking cursor
-            const cursor = document.createElement("span");
-            cursor.className = "retro-cursor";
-            typewriterEl.appendChild(cursor);
+                const cursor = document.createElement("span");
+                cursor.className = "retro-cursor";
+                DOM.typewriterEl.appendChild(cursor);
+            }
 
-            // Keep content scrolled down as text prints
-            letterScrollBox.scrollTop = letterScrollBox.scrollHeight;
+            if (DOM.letterScrollBox) {
+                DOM.letterScrollBox.scrollTop = DOM.letterScrollBox.scrollHeight;
+            }
 
             if (textIdx >= fullText.length) {
-                clearInterval(typewritingTimer);
+                clearInterval(STATE.typewritingTimer);
             }
         }, 25);
-    }
+    };
 
-    function closeLetterMessageModal() {
-        clearInterval(typewritingTimer);
-        modalOverlay.classList.remove("active");
-
-        // Delay display none until fade-out finishes
-        setTimeout(() => {
-            modalOverlay.style.display = "none";
-        }, 300);
-    }
-
-    modalCloseBtn.addEventListener("click", closeLetterMessageModal);
-
-    // Close modal on clicking outside background wrapper
-    modalOverlay.addEventListener("click", (e) => {
-        if (e.target === modalOverlay) {
-            closeLetterMessageModal();
+    const closeLetterMessageModal = () => {
+        clearInterval(STATE.typewritingTimer);
+        if (DOM.modalOverlay) {
+            DOM.modalOverlay.classList.remove("active");
+            setTimeout(() => {
+                DOM.modalOverlay.style.display = "none";
+            }, 300);
         }
-    });
+    };
 
-    // Final smiley button confetti blast trigger
-    smileyBtn.addEventListener("click", () => {
-        const finalConfettiColors = ["#ff1f9e", "#ff5f9f", "#ff6767", "#ff6c6c", "#ff5cb0"];
-        confetti({
-            particleCount: 180,
-            spread: 100,
-            origin: { y: 0.6 },
-            colors: finalConfettiColors,
-            gravity: 0.85
-        });
+    /* ==========================================
+       EVENT LISTENERS CORE MANAGEMENT
+       ========================================== */
+    const setupCoreEventListeners = () => {
+        // Stage 0 hold button bindings
+        if (DOM.holdBtn) {
+            DOM.holdBtn.addEventListener("mousedown", triggerHoldStart);
+            DOM.holdBtn.addEventListener("mouseup", triggerHoldRelease);
+            DOM.holdBtn.addEventListener("mouseleave", triggerHoldRelease);
 
-        setTimeout(() => {
-            confetti({
-                particleCount: 75,
-                angle: 60,
-                spread: 55,
-                origin: { x: 0, y: 0.65 },
-                colors: finalConfettiColors
+            DOM.holdBtn.addEventListener("touchstart", (e) => {
+                e.preventDefault();
+                triggerHoldStart();
+            }, { passive: false });
+
+            DOM.holdBtn.addEventListener("touchend", (e) => {
+                e.preventDefault();
+                triggerHoldRelease();
+            }, { passive: false });
+        }
+
+        // Stage 1 transitioning mechanics
+        if (DOM.introNextBtn) {
+            DOM.introNextBtn.addEventListener("click", () => showStage(2));
+        }
+
+        // Stage 2 game transition mechanics
+        if (DOM.cakeNextBtn) {
+            DOM.cakeNextBtn.addEventListener("click", () => showStage(3));
+        }
+
+        // Stage 3 gallery navigation interface
+        if (DOM.galleryNextBtn) {
+            DOM.galleryNextBtn.addEventListener("click", () => showStage(4));
+        }
+
+        // Stage 4 letter unsealing interactions
+        if (DOM.envelopeCard) {
+            DOM.envelopeCard.addEventListener("click", handleEnvelopeUnsealing);
+        }
+
+        if (DOM.modalCloseBtn) {
+            DOM.modalCloseBtn.addEventListener("click", closeLetterMessageModal);
+        }
+
+        if (DOM.modalOverlay) {
+            DOM.modalOverlay.addEventListener("click", (e) => {
+                if (e.target === DOM.modalOverlay) {
+                    closeLetterMessageModal();
+                }
             });
-            confetti({
-                particleCount: 75,
-                angle: 120,
-                spread: 55,
-                origin: { x: 1, y: 0.65 },
-                colors: finalConfettiColors
+        }
+
+        // Final celebratory confetti actions
+        if (DOM.smileyBtn) {
+            DOM.smileyBtn.addEventListener("click", () => {
+                const finalConfettiColors = ["#ff1f9e", "#ff5f9f", "#ff6767", "#ff6c6c", "#ff5cb0"];
+                confetti({
+                    particleCount: 180,
+                    spread: 100,
+                    origin: { y: 0.6 },
+                    colors: finalConfettiColors,
+                    gravity: 0.85
+                });
+
+                setTimeout(() => {
+                    confetti({ particleCount: 75, angle: 60, spread: 55, origin: { x: 0, y: 0.65 }, colors: finalConfettiColors });
+                    confetti({ particleCount: 75, angle: 120, spread: 55, origin: { x: 1, y: 0.65 }, colors: finalConfettiColors });
+                }, 100);
             });
-        }, 100);
-    });
-} catch (e) {
-    var d = document.createElement('div');
-    d.style.cssText = 'position:fixed;top:0;left:0;right:0;background:red;color:white;padding:12px;font-size:13px;z-index:9999;font-family:monospace;white-space:pre-wrap;';
-    d.textContent = 'STARTUP ERROR: ' + e.message + '\n' + e.stack;
-    document.body.appendChild(d);
-}
+        }
+    };
+
+    // Execute application load when DOM context is fully assembled
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initApp);
+    } else {
+        initApp();
+    }
+})();
