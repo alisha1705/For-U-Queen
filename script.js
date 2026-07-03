@@ -228,40 +228,61 @@ I love you forever and ever and ever ♾️😘😘❤️🧿`
         }, 20);
     }
 
+    // function triggerHoldDone() {
+    //     // 1. Play Background Music with fade-in volume
+    //     STATE.audio.volume = 0;
+    //     STATE.audio.play().then(() => {
+    //         let vol = 0;
+    //         let fadeTimer = setInterval(() => {
+    //             if (vol < 0.9) {
+    //                 vol += 0.1;
+    //                 STATE.audio.volume = vol;
+    //             } else {
+    //                 STATE.audio.volume = 1.0;
+    //                 clearInterval(fadeTimer);
+    //             }
+    //         }, 100);
+    //     }).catch(() => { });
     function triggerHoldDone() {
-        // 1. Play Background Music with fade-in volume
-        STATE.audio.volume = 0;
-        STATE.audio.play().then(() => {
-            let vol = 0;
-            let fadeTimer = setInterval(() => {
-                if (vol < 0.9) {
-                    vol += 0.1;
-                    STATE.audio.volume = vol;
-                } else {
-                    STATE.audio.volume = 1.0;
-                    clearInterval(fadeTimer);
-                }
-            }, 100);
-        }).catch(() => { });
+    // Stop hold animation
+    clearInterval(STATE.holdInterval);
+    STATE.holdProgress = 100;
 
-        // 2. Curtains Slide Open reveal animation
-        const overlay = document.getElementById("curtain-overlay");
-        overlay.classList.add("open");
+    // Disable the hold button so releasing doesn't reset it
+    holdBtn.style.pointerEvents = "none";
+    holdBtn.classList.remove("pressing");
 
-        // 3. Trigger Countdown stage
-        setTimeout(() => {
-            // Hide hold button content container
-            document.querySelector(".curtain-content").style.opacity = "0";
-            document.querySelector(".curtain-content").style.pointerEvents = "none";
+    // Hide the Hold Me section immediately
+    const curtainContent = document.querySelector(".curtain-content");
+    curtainContent.style.opacity = "0";
+    curtainContent.style.pointerEvents = "none";
 
-            // Show Countdown
-            const countdownStage = document.getElementById("stage-countdown");
-            countdownStage.style.display = "flex";
-            countdownStage.classList.add("active");
+    // 1. Play Background Music with fade-in volume
+    STATE.audio.volume = 0;
+    STATE.audio.play().then(() => {
+        let vol = 0;
+        let fadeTimer = setInterval(() => {
+            if (vol < 0.9) {
+                vol += 0.1;
+                STATE.audio.volume = vol;
+            } else {
+                STATE.audio.volume = 1.0;
+                clearInterval(fadeTimer);
+            }
+        }, 100);
+    }).catch(() => {});
 
-            startCountdown();
-        }, 1000);
-    }
+    // 2. Open curtains
+    const overlay = document.getElementById("curtain-overlay");
+    overlay.classList.add("open");
+
+    // 3. Show countdown immediately
+    const countdownStage = document.getElementById("stage-countdown");
+    countdownStage.style.display = "flex";
+    countdownStage.classList.add("active");
+
+    startCountdown();
+}
 
     // Listeners for hold button interactions (Mouse & Mobile Touch)
     holdBtn.addEventListener("mousedown", triggerHoldStart);
