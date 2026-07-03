@@ -244,52 +244,45 @@ I love you forever and ever and ever ♾️😘😘❤️🧿`
     //         }, 100);
     //     }).catch(() => { });
     function triggerHoldDone() {
-        // Stop hold animation
-        clearInterval(STATE.holdInterval);
-        STATE.holdProgress = 100;
+    // Stop hold animation
+    clearInterval(STATE.holdInterval);
+    STATE.holdProgress = 100;
 
-        // Disable the hold button so releasing doesn't reset it
-        holdBtn.style.pointerEvents = "none";
-        holdBtn.classList.remove("pressing");
+    // Disable the hold button so releasing doesn't reset it
+    holdBtn.style.pointerEvents = "none";
+    holdBtn.classList.remove("pressing");
 
-        // Hide the Hold Me section immediately
-        const curtainContent = document.querySelector(".curtain-content");
-        curtainContent.style.opacity = "0";
-        curtainContent.style.pointerEvents = "none";
-        STATE.audio.currentTime = 0;
+    // Hide the Hold Me section immediately
+    const curtainContent = document.querySelector(".curtain-content");
+    curtainContent.style.opacity = "0";
+    curtainContent.style.pointerEvents = "none";
 
-        // STATE.audio.play().then(() => {
-        //     console.log("Music Started");
-        // }).catch(err => {
-        //     console.error(err);
-        //     alert(err.name + "\n" + err.message);
-        // });
-        // 1. Play Background Music with fade-in volume
-        STATE.audio.volume = 0;
-        STATE.audio.play().then(() => {
-            let vol = 0;
-            let fadeTimer = setInterval(() => {
-                if (vol < 0.9) {
-                    vol += 0.1;
-                    STATE.audio.volume = vol;
-                } else {
-                    STATE.audio.volume = 1.0;
-                    clearInterval(fadeTimer);
-                }
-            }, 100);
-        }).catch(() => { });
+    // 1. Play Background Music with fade-in volume
+    STATE.audio.volume = 0;
+    STATE.audio.play().then(() => {
+        let vol = 0;
+        let fadeTimer = setInterval(() => {
+            if (vol < 0.9) {
+                vol += 0.1;
+                STATE.audio.volume = vol;
+            } else {
+                STATE.audio.volume = 1.0;
+                clearInterval(fadeTimer);
+            }
+        }, 100);
+    }).catch(() => {});
 
-        // 2. Open curtains
-        const overlay = document.getElementById("curtain-overlay");
-        overlay.classList.add("open");
+    // 2. Open curtains
+    const overlay = document.getElementById("curtain-overlay");
+    overlay.classList.add("open");
 
-        // 3. Show countdown immediately
-        const countdownStage = document.getElementById("stage-countdown");
-        countdownStage.style.display = "flex";
-        countdownStage.classList.add("active");
+    // 3. Show countdown immediately
+    const countdownStage = document.getElementById("stage-countdown");
+    countdownStage.style.display = "flex";
+    countdownStage.classList.add("active");
 
-        startCountdown();
-    }
+    startCountdown();
+}
 
     // Listeners for hold button interactions (Mouse & Mobile Touch)
     holdBtn.addEventListener("mousedown", triggerHoldStart);
