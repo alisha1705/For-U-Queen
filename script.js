@@ -262,19 +262,26 @@ console.log("error:", STATE.audio.error);
     curtainContent.style.pointerEvents = "none";
 
     // 1. Play Background Music with fade-in volume
-    STATE.audio.volume = 0;
-    STATE.audio.play().then(() => {
-        let vol = 0;
-        let fadeTimer = setInterval(() => {
-            if (vol < 0.9) {
-                vol += 0.1;
-                STATE.audio.volume = vol;
-            } else {
-                STATE.audio.volume = 1.0;
-                clearInterval(fadeTimer);
-            }
-        }, 100);
-    }).catch(() => {});
+STATE.audio.pause();
+STATE.audio.currentTime = 0;
+STATE.audio.volume = 0;
+
+try {
+    await STATE.audio.play();
+
+    let vol = 0;
+    const fade = setInterval(() => {
+        vol += 0.1;
+        if (vol >= 1) {
+            vol = 1;
+            clearInterval(fade);
+        }
+        STATE.audio.volume = vol;
+    }, 100);
+
+} catch (e) {
+    console.error(e);
+}
 
     // 2. Open curtains
     const overlay = document.getElementById("curtain-overlay");
