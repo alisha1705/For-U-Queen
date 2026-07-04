@@ -10,7 +10,7 @@ try {
     const CONFIG = {
         // Basic Info
         targetName: "My girl",      // Name/pronoun of the birthday recipient
-        age: 20,                    // Age celebrated
+        age: 17,                    // Age celebrated
 
         // Media Asset URLs (Can point to local paths or CDNs)
         musicUrl: "song.mp3",
