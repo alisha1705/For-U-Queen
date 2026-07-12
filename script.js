@@ -198,6 +198,12 @@ I love you forever and ever and ever ♾️😘😘❤️🧿`
         holdBtn.classList.add("pressing");
         clearInterval(STATE.holdInterval);
 
+        // Start playing silently on user interaction to unlock the audio context
+        if (STATE.audio) {
+            STATE.audio.volume = 0;
+            STATE.audio.play().catch(e => console.log("Audio unlock play failed:", e));
+        }
+
         STATE.holdInterval = setInterval(() => {
             if (STATE.holdProgress < 100) {
                 STATE.holdProgress += 1.5;
@@ -214,6 +220,12 @@ I love you forever and ever and ever ♾️😘😘❤️🧿`
     function triggerHoldRelease() {
         holdBtn.classList.remove("pressing");
         clearInterval(STATE.holdInterval);
+
+        // Pause and reset audio if hold released before completing
+        if (STATE.audio && STATE.holdProgress < 100) {
+            STATE.audio.pause();
+            STATE.audio.currentTime = 0;
+        }
 
         // Animate progress resetting to 0
         STATE.holdInterval = setInterval(() => {
